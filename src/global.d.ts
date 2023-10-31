@@ -10,3 +10,7 @@ interface TResponse<T = void> {
   data?: T
   msg?: string
 }
+
+interface TUserRecord {
+  id: number
+}

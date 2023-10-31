@@ -1,3 +1,81 @@
+'use client'
+
+import { BlockOutlined, LogoutOutlined, MenuOutlined, UserAddOutlined } from '@ant-design/icons'
+import { Button, Dropdown, Table } from 'antd'
+import Logo from '@/components/Logo'
+import UserModal from './components/User'
+import { useRef } from 'react'
+import useSWR from 'swr'
+import axios from 'axios'
+import type { MenuProps } from 'antd'
+import type { ColumnType } from 'antd/es/table'
+import type { UserModalRef } from './components/User'
+
+enum MenuKeys {
+  User,
+  Model,
+  Logout,
+}
+
 export default function Dashboard() {
-  return <div>dashboard</div>
+  const userModalRef = useRef<UserModalRef>(null)
+
+  const menu: MenuProps = {
+    items: [
+      { key: MenuKeys.User, label: '添加用户', icon: <UserAddOutlined /> },
+      { key: MenuKeys.Model, label: '模型管理', icon: <BlockOutlined /> },
+      { type: 'divider' },
+      { key: MenuKeys.Logout, label: '退出登录', icon: <LogoutOutlined />, danger: true },
+    ],
+    onClick: ({ key }) => {
+      if (key === `${MenuKeys.User}`) {
+        userModalRef.current?.show()
+      }
+    },
+  }
+
+  const { data, isLoading } = useSWR('/api/dashboard/users', url =>
+    axios.get<TResponse<TUserRecord[]>>(url).then(res => res.data?.data || [])
+  )
+
+  const columns: ColumnType<TUserRecord>[] = [
+    { title: '序号', width: 62, render: (value, record, index) => index + 1 },
+    { title: '名称', dataIndex: 'name' },
+    { title: '模型' },
+    { title: '协议' },
+    { title: '端口' },
+    { title: '流量' },
+    { title: '到期时间' },
+    {
+      title: '启用',
+      width: 44 + 32,
+    },
+    {
+      title: '操作',
+      width: 100 + 32,
+    },
+  ]
+
+  return (
+    <div className="max-w-[960px] mx-auto py-16 px-4">
+      <div className="flex items-center justify-between mb-4">
+        <Logo />
+        <Dropdown placement="bottomRight" menu={menu}>
+          <Button icon={<MenuOutlined />} />
+        </Dropdown>
+      </div>
+
+      <Table
+        bordered
+        loading={isLoading}
+        rowKey="id"
+        columns={columns}
+        dataSource={data}
+        scroll={{ x: 'max-content' }}
+        pagination={{ hideOnSinglePage: true }}
+      />
+
+      <UserModal ref={userModalRef} />
+    </div>
+  )
 }

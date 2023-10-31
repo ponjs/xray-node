@@ -55,8 +55,21 @@ export default async function Home() {
     },
   ]
 
-  const referer = headers().get('referer')
-  const link = referer ? `${new URL(referer).origin}/s/${userinfo.name}` : ''
+  const getHostUrl = () => {
+    const headersList = headers()
+
+    const referer = headersList.get('referer')
+    if (referer) return referer.replace(/\/+$/, '')
+
+    const forwardedProto = headersList.get('x-forwarded-proto')
+    const forwardedHost = headersList.get('x-forwarded-host')
+    if (forwardedProto && forwardedHost) return `${forwardedProto}://${forwardedHost}`
+
+    return `http://${headersList.get('host')}`
+  }
+
+  const host = getHostUrl()
+  const link = host ? `${host}/s/${userinfo.name}` : ''
 
   const qrcode = await QRCode.toDataURL(link, {
     margin: 1.5,
@@ -65,7 +78,7 @@ export default async function Home() {
   }).catch(() => '')
 
   return (
-    <div className="max-w-[70ch] mx-auto pt-24 px-8 pb-16">
+    <div className="max-w-[60ch] mx-auto pt-24 px-8 pb-16">
       <div className="flex justify-between items-end">
         <Logo />
         <HomeActions link={link} />
@@ -95,7 +108,7 @@ export default async function Home() {
 
       <Image
         // 1 + 15 / 180 = 1.0833
-        className="my-8 scale-[1.0833] dark:scale-[1] dark:opacity-90"
+        className="my-8 scale-[1.0833]"
         alt="qrcode"
         src={qrcode}
         width={180}

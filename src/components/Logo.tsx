@@ -1,13 +1,23 @@
-import { memo } from 'react'
+'use client'
+
+import clsx from 'clsx'
+import { memo, useState } from 'react'
 
 function Logo({ className }: { className?: string }) {
+  const [animating, setAnimating] = useState(false)
+  const handleClick = () => {
+    setAnimating(true)
+    setTimeout(() => setAnimating(false), 500)
+  }
+
   return (
     <svg
-      className={className}
+      className={clsx(className, 'cursor-pointer select-none', { 'animate-shake': animating })}
       xmlns="http://www.w3.org/2000/svg"
       width="48"
       height="48"
       viewBox="0 0 32 32"
+      onClick={handleClick}
     >
       <g fill="none">
         <path
