@@ -1,8 +1,14 @@
 import { memo } from 'react'
 
-function Logo() {
+function Logo({ className }: { className?: string }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 32 32">
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      width="48"
+      height="48"
+      viewBox="0 0 32 32"
+    >
       <g fill="none">
         <path
           fill="#F8312F"
