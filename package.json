@@ -10,17 +10,23 @@
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.17.2",
+    "@ant-design/icons": "^5.2.6",
     "antd": "^5.10.3",
     "axios": "^1.6.0",
     "clsx": "^2.0.0",
+    "dayjs": "^1.11.10",
     "next": "14.0.1",
+    "qrcode": "^1.5.3",
     "react": "^18",
+    "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18",
     "swr": "^2.2.4"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/qrcode": "^1.5.4",
     "@types/react": "^18",
+    "@types/react-copy-to-clipboard": "^5.0.6",
     "@types/react-dom": "^18",
     "@typescript-eslint/eslint-plugin": "^6.9.1",
     "@typescript-eslint/parser": "^6.9.1",
