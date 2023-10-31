@@ -1,0 +1,15 @@
+.input {
+  @apply w-[280px] h-[48px] pl-1 pr-0;
+}
+
+.input input {
+  @apply px-2 !important;
+}
+
+.input :global(.ant-input-suffix) {
+  @apply ml-0 !important;
+}
+
+.icon {
+  @apply flex items-center justify-center w-12 h-12 text-xl cursor-pointer transition hover:opacity-40;
+}
