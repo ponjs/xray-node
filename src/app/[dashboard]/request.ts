@@ -22,7 +22,7 @@ _axios.interceptors.response.use(response => {
 export default _axios
 
 export function useModels() {
-  return useSWR('/api/dashboard/models', url =>
+  return useSWR('/api/dashboard/model/list', url =>
     _axios.get<TResponse<TModelRecord[]>>(url).then(res => res.data.data || [])
   )
 }
