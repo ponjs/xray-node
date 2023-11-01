@@ -4,7 +4,7 @@ import { LoadingOutlined, SwapRightOutlined } from '@ant-design/icons'
 import { Button, Form, Input } from 'antd'
 import Logo from '@/components/Logo'
 import useSWRMutation from 'swr/mutation'
-import axios from '../request'
+import request from '../request'
 import clsx from 'clsx'
 import type { Rule } from 'antd/es/form'
 
@@ -19,7 +19,7 @@ export default function Login() {
   const { error, isMutating, reset, trigger } = useSWRMutation(
     '/api/dashboard/login',
     (url, { arg }: { arg: TFormData }) =>
-      axios.post<TResponse>(url, arg).then(res => res.data.code !== 200 && Promise.reject(res)),
+      request.post<TResponse>(url, arg).then(res => res.data.code !== 200 && Promise.reject(res)),
     {
       onSuccess: () => {
         location.reload()

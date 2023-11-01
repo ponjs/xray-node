@@ -1,5 +1,3 @@
-'use client'
-
 import { Modal } from 'antd'
 import UserForm from './Form'
 import { forwardRef, useImperativeHandle, useState } from 'react'
@@ -28,7 +26,7 @@ const UserModal = forwardRef<UserModalRef>((props, ref) => {
       footer={null}
       onCancel={hide}
     >
-      <UserForm record={record} onCancel={hide} />
+      <UserForm record={record} onCancel={hide} onFinish={hide} />
     </Modal>
   )
 })

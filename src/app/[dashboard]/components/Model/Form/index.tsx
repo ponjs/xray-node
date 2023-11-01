@@ -8,10 +8,11 @@ import useSWRMutation from 'swr/mutation'
 import { useMemo, useRef } from 'react'
 import { InboundContext } from './context'
 import { PROTOCOL_OPTIONS } from './constant'
-import { assignValues } from '@/utils'
-import { Inbound, ObjectUtil, Protocols } from '@/lib/xray.js'
+import { organizeObject } from '@/utils'
+import { Inbound, Protocols } from '@/lib/xray.js'
+import toInbound from '@/lib/services/toInbound'
 import qs from 'qs'
-import axios, { useModels } from '../../../request'
+import request, { useModels } from '../../../request'
 import type { FieldData } from 'rc-field-form/lib/interface'
 import type { TFormData } from './types'
 
@@ -27,13 +28,11 @@ export default function ModelForm({ record, onCancel, onFinish }: ModelFormProps
 
   const inbound = useRef(
     record
-      ? Inbound.fromJson({
+      ? toInbound({
           protocol: record.protocol,
-          settings: ObjectUtil.isEmpty(record.settings) ? {} : JSON.parse(record.settings),
-          streamSettings: ObjectUtil.isEmpty(record.streamSettings)
-            ? {}
-            : JSON.parse(record.streamSettings),
-          sniffing: ObjectUtil.isEmpty(record.sniffing) ? {} : JSON.parse(record.sniffing),
+          settings: record.settings,
+          streamSettings: record.streamSettings,
+          sniffing: record.sniffing,
         })
       : new Inbound(undefined, '', Protocols.TROJAN)
   )
@@ -56,7 +55,7 @@ export default function ModelForm({ record, onCancel, onFinish }: ModelFormProps
   const onFieldsChange = (changedFields: FieldData[]) => {
     changedFields.forEach(({ name, value }) => {
       if (!['name', 'host', 'port'].includes(name?.[0])) {
-        assignValues(inbound.current, name, value)
+        organizeObject(inbound.current, name, value)
       }
     })
   }
@@ -64,7 +63,7 @@ export default function ModelForm({ record, onCancel, onFinish }: ModelFormProps
   const { isMutating, trigger } = useSWRMutation(
     '/api/dashboard/model/upsert',
     (url, { arg }: { arg: TFormData }) =>
-      axios.post<TResponse>(
+      request.post<TResponse>(
         url,
         qs.stringify({
           id: record?.id,

@@ -44,7 +44,7 @@ type XInboundParams = Omit<XInboundRecord, 'id' | 'tag'>
 interface TUserRecord {
   id: number
   name: string
-  model: Pick<TModelRecord, 'id' | 'name'>
+  model: Pick<TModelRecord, 'id' | 'name' | 'host'>
   inbound?: XInboundRecord
 }
 

@@ -1,8 +1,10 @@
-'use client'
-
-import { Button, DatePicker, Form, Input, InputNumber, Select, Space } from 'antd'
-import { useModels } from '../../request'
+import { Button, DatePicker, Form, Input, InputNumber, Select, Space, message } from 'antd'
+import useSWRMutation from 'swr/mutation'
+import request, { useModels, useUsers } from '../../request'
 import type { Dayjs } from 'dayjs'
+import { useMemo } from 'react'
+import { ONE_GB, toFixed } from '@/utils'
+import dayjs from 'dayjs'
 
 type TFormData = {
   name: string
@@ -17,19 +19,57 @@ interface UserFormProps {
   onFinish?: () => void
 }
 
-export default function UserForm(props: UserFormProps) {
+export default function UserForm({ record, onCancel, onFinish }: UserFormProps) {
   const [form] = Form.useForm<TFormData>()
+
   const models = useModels()
+  const users = useUsers()
+
+  const initialValues = useMemo<Partial<TFormData>>(
+    () => ({
+      name: record?.name,
+      modelId: record?.model.id,
+      total: record?.inbound?.total ? toFixed(record?.inbound?.total / ONE_GB, 2) : undefined,
+      expiryTime: record?.inbound?.expiryTime ? dayjs(record?.inbound?.expiryTime) : undefined,
+    }),
+    [record?.inbound?.expiryTime, record?.inbound?.total, record?.model.id, record?.name]
+  )
+
+  const { isMutating, trigger } = useSWRMutation(
+    '/api/dashboard/user/upsert',
+    (url, { arg }: { arg: TFormData }) =>
+      request.post<TResponse>(url, {
+        ...arg,
+        expiryTime: arg.expiryTime?.hour(23).minute(59).second(59).valueOf(),
+        id: record?.id,
+      }),
+    {
+      onSuccess: res => {
+        if (res.data.code === 200) {
+          message.success('保存成功')
+          onFinish?.()
+          users.mutate()
+        }
+      },
+    }
+  )
 
   return (
-    <Form className="pt-4" form={form} autoComplete="off" labelCol={{ span: 5 }}>
+    <Form
+      className="pt-4"
+      form={form}
+      autoComplete="off"
+      labelCol={{ span: 5 }}
+      initialValues={initialValues}
+      onFinish={trigger}
+    >
       <Form.Item
         label="用户名"
         name="name"
         rules={[{ required: true }]}
         normalize={value => value?.trim()}
       >
-        <Input />
+        <Input disabled={!!record} />
       </Form.Item>
 
       <Form.Item label="模型" name="modelId" rules={[{ required: true }]}>
@@ -49,8 +89,8 @@ export default function UserForm(props: UserFormProps) {
       </Form.Item>
 
       <Space className="w-full justify-end">
-        <Button onClick={props.onCancel}>取消</Button>
-        <Button type="primary" htmlType="submit">
+        <Button onClick={onCancel}>取消</Button>
+        <Button loading={isMutating} type="primary" htmlType="submit">
           保存
         </Button>
       </Space>

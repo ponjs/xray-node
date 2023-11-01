@@ -4,7 +4,7 @@ import ActionButton from '@/components/ActionButton'
 import FormModal from './FormModal'
 import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { useBoolean } from '@/hooks'
-import axios, { useModels } from '../../request'
+import request, { useModels } from '../../request'
 import type { ColumnType } from 'antd/es/table'
 import type { FormModalRef } from './FormModal'
 
@@ -19,7 +19,7 @@ const ModelDrawer = forwardRef<ModelDrawerRef>((props, ref) => {
   const { data, isLoading, mutate } = useModels()
 
   const handleDelete = (id: number) =>
-    axios.post<TResponse>('/api/dashboard/model/delete', { id }).then(res => {
+    request.post<TResponse>('/api/dashboard/model/delete', { id }).then(res => {
       if (res.data.code === 200) {
         message.success('删除成功')
         mutate()
@@ -36,9 +36,9 @@ const ModelDrawer = forwardRef<ModelDrawerRef>((props, ref) => {
     {
       title: '操作',
       fixed: 'right',
-      width: 72 + 32,
+      width: 66 + 32,
       render: (_, record) => (
-        <Space>
+        <Space size={2}>
           <ActionButton
             danger
             icon={<DeleteOutlined />}
