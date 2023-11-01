@@ -1,8 +1,8 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
-import { Button, Drawer, Space, Table, message } from 'antd'
+import { Button, Drawer, Space, Table, Tag, message } from 'antd'
 import ActionButton from '@/components/ActionButton'
 import FormModal from './FormModal'
-import { forwardRef, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { useBoolean } from '@/hooks'
 import request, { useModels } from '../../request'
 import type { ColumnType } from 'antd/es/table'
@@ -26,12 +26,44 @@ const ModelDrawer = forwardRef<ModelDrawerRef>((props, ref) => {
       }
     })
 
+  const [currentPage, setCurrentPage] = useState(1)
+
   const columns: ColumnType<TModelRecord>[] = [
-    { title: '序号', width: 62, render: (value, record, index) => index + 1 },
+    {
+      title: '序号',
+      width: 62,
+      render: (value, record, index) => index + 1 + (currentPage - 1) * 10,
+    },
     { title: '名称', dataIndex: 'name' },
     { title: '地址', dataIndex: 'host' },
-    { title: '端口范围', dataIndex: 'port' },
-    { title: '协议', dataIndex: 'protocol' },
+    {
+      title: '端口范围',
+      dataIndex: 'port',
+      render: (value: string) => {
+        const [min, max] = value.split('-').map((p, i) => (
+          <Tag key={i} className="m-0" color="blue">
+            {p}
+          </Tag>
+        ))
+
+        return (
+          <div className="flex items-center space-x-1">
+            {min}
+            <span>-</span>
+            {max}
+          </div>
+        )
+      },
+    },
+    {
+      title: '协议',
+      dataIndex: 'protocol',
+      render: value => (
+        <Tag className="m-0" color="blue">
+          {value}
+        </Tag>
+      ),
+    },
     { title: '用户数量', render: (_, record) => record._count.users },
     {
       title: '操作',
@@ -75,7 +107,7 @@ const ModelDrawer = forwardRef<ModelDrawerRef>((props, ref) => {
         columns={columns}
         dataSource={data}
         scroll={{ x: 'max-content' }}
-        pagination={{ hideOnSinglePage: true }}
+        pagination={{ hideOnSinglePage: true, current: currentPage, onChange: setCurrentPage }}
       />
     </Drawer>
   )

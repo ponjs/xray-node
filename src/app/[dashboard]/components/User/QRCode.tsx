@@ -40,7 +40,7 @@ const UserQRCode = forwardRef<UserQRCodeRef>((props, ref) => {
       <div className="flex flex-col items-center justify-center">
         <Spin spinning={isMutating}>
           <CopyToClipboard text={data} onCopy={() => message.success('已复制')}>
-            <div className="w-[240px] h-[240px] cursor-pointer select-none">
+            <div className="w-[240px] h-[240px] cursor-pointer select-none transition-transform active:scale-95">
               {data && <QRCode bordered={false} size={240} value={data} />}
             </div>
           </CopyToClipboard>

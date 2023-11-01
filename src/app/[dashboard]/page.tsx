@@ -16,7 +16,7 @@ import ActionSwicth from '@/components/ActionSwicth'
 import UserModal from './components/User/FormModal'
 import UserQRCode from './components/User/QRCode'
 import ModelDrawer from './components/Model'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { formatBytes } from '@/utils'
 import dayjs from 'dayjs'
 import request, { useUsers } from './request'
@@ -81,24 +81,37 @@ export default function Dashboard() {
       .post<TResponse>('/api/dashboard/user/enable', data)
       .then(res => (res.data.code === 200 ? mutate() : Promise.reject(res)))
 
+  const [currentPage, setCurrentPage] = useState(1)
+
   const columns: ColumnType<TUserRecord>[] = [
-    { title: '序号', width: 62, render: (value, record, index) => index + 1 },
+    {
+      title: '序号',
+      width: 62,
+      render: (value, record, index) => index + 1 + (currentPage - 1) * 10,
+    },
     { title: '名称', dataIndex: 'name' },
     { title: '模型', render: (_, record) => record.model.name },
-    { title: '协议', render: inboundRender(({ protocol }) => <Tag>{protocol}</Tag>) },
+    {
+      title: '协议',
+      render: inboundRender(({ protocol }) => (
+        <Tag className="m-0" color="blue">
+          {protocol}
+        </Tag>
+      )),
+    },
     { title: '端口', render: inboundRender(({ port }) => port) },
     {
       title: '流量',
       render: inboundRender(({ up, down, total }) => (
         <div>
-          <Tag>
+          <Tag className="m-0" color="blue">
             {formatBytes(up)} / {formatBytes(down)}
           </Tag>
           {total ? (
-            <Tag color={up + down < total ? undefined : 'red'}>{formatBytes(total)}</Tag>
-          ) : (
-            <Tag>无限制</Tag>
-          )}
+            <Tag className="ml-2" color={up + down < total ? 'green' : 'red'}>
+              {formatBytes(total)}
+            </Tag>
+          ) : null}
         </div>
       )),
     },
@@ -107,7 +120,7 @@ export default function Dashboard() {
       render: inboundRender(({ expiryTime }) => {
         const isExpired = expiryTime && Date.now() >= expiryTime
         return (
-          <Tag color={isExpired ? 'red' : undefined}>
+          <Tag className="m-0" color={isExpired ? 'red' : 'green'}>
             {expiryTime ? dayjs(expiryTime).format('YYYY-MM-DD') : '无限期'}
           </Tag>
         )
@@ -167,7 +180,7 @@ export default function Dashboard() {
         columns={columns}
         dataSource={data}
         scroll={{ x: 'max-content' }}
-        pagination={{ hideOnSinglePage: true }}
+        pagination={{ hideOnSinglePage: true, current: currentPage, onChange: setCurrentPage }}
       />
 
       <UserModal ref={userModalRef} />
