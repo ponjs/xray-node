@@ -1,15 +1,13 @@
-'use client'
-
-import { Modal } from 'antd'
-import UserForm from './Form'
-import { forwardRef, useImperativeHandle, useState } from 'react'
 import { useBoolean } from '@/hooks'
+import { Modal } from 'antd'
+import ModelForm from './Form'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 
-export type UserModalRef = { show: (value?: TUserRecord) => void }
+export type ModelModalRef = { show: (value?: TModelRecord) => void }
 
-const UserModal = forwardRef<UserModalRef>((props, ref) => {
+const ModelModal = forwardRef<ModelModalRef>((props, ref) => {
   const [visible, { setTrue: show, setFalse: hide }] = useBoolean(false)
-  const [record, setRecord] = useState<TUserRecord>()
+  const [record, setRecord] = useState<TModelRecord>()
 
   useImperativeHandle(ref, () => ({
     show: value => {
@@ -21,16 +19,16 @@ const UserModal = forwardRef<UserModalRef>((props, ref) => {
   return (
     <Modal
       open={visible}
-      title={record ? '编辑用户' : '添加用户'}
-      width={420}
+      title={record ? '编辑模型' : '添加模型'}
+      width={640}
       centered
       destroyOnClose
       footer={null}
       onCancel={hide}
     >
-      <UserForm record={record} onCancel={hide} />
+      <ModelForm onCancel={hide} />
     </Modal>
   )
 })
 
-export default UserModal
+export default ModelModal

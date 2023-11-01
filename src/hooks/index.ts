@@ -1,4 +1,6 @@
+import axios from 'axios'
 import { useMemo, useState } from 'react'
+import useSWR from 'swr'
 
 export function useBoolean(defaultValue = false) {
   const [state, setState] = useState(defaultValue)
@@ -14,4 +16,12 @@ export function useBoolean(defaultValue = false) {
   )
 
   return [state, actions] as const
+}
+
+export function useModels() {
+  return useSWR('/api/dashboard/models', url =>
+    axios
+      .get<TResponse<TModelRecord[]>>(url, { withCredentials: true })
+      .then(res => res.data.data || [])
+  )
 }

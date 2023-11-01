@@ -10,3 +10,13 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
 }
+
+@media (max-width: 575px) {
+  .ant-form-item {
+    margin-bottom: 22px;
+  }
+
+  .ant-form-item .ant-form-item-label {
+    padding: 0;
+  }
+}

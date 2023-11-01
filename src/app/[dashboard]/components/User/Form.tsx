@@ -1,6 +1,7 @@
 'use client'
 
 import { Button, DatePicker, Form, Input, InputNumber, Select, Space } from 'antd'
+import { useModels } from '@/hooks'
 import type { Dayjs } from 'dayjs'
 
 type TFormData = {
@@ -13,11 +14,12 @@ type TFormData = {
 interface UserFormProps {
   record?: TUserRecord
   onCancel?: () => void
-  onFinish?: (values: TFormData) => void
+  onFinish?: () => void
 }
 
 export default function UserForm(props: UserFormProps) {
   const [form] = Form.useForm<TFormData>()
+  const models = useModels()
 
   return (
     <Form className="pt-4" form={form} autoComplete="off" labelCol={{ span: 5 }}>
@@ -31,7 +33,11 @@ export default function UserForm(props: UserFormProps) {
       </Form.Item>
 
       <Form.Item label="模型" name="modelId" rules={[{ required: true }]}>
-        <Select />
+        <Select
+          loading={models.isLoading}
+          options={models.data}
+          fieldNames={{ label: 'name', value: 'id' }}
+        />
       </Form.Item>
 
       <Form.Item label="总流量" name="total">

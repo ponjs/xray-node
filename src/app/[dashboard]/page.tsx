@@ -4,12 +4,14 @@ import { BlockOutlined, LogoutOutlined, MenuOutlined, UserAddOutlined } from '@a
 import { Button, Dropdown, Table } from 'antd'
 import Logo from '@/components/Logo'
 import UserModal from './components/User'
+import ModelDrawer from './components/Model'
 import { useRef } from 'react'
 import useSWR from 'swr'
 import axios from 'axios'
 import type { MenuProps } from 'antd'
 import type { ColumnType } from 'antd/es/table'
 import type { UserModalRef } from './components/User'
+import type { ModelDrawerRef } from './components/Model'
 
 enum MenuKeys {
   User,
@@ -19,6 +21,7 @@ enum MenuKeys {
 
 export default function Dashboard() {
   const userModalRef = useRef<UserModalRef>(null)
+  const modelDrawerRef = useRef<ModelDrawerRef>(null)
 
   const menu: MenuProps = {
     items: [
@@ -30,6 +33,12 @@ export default function Dashboard() {
     onClick: ({ key }) => {
       if (key === `${MenuKeys.User}`) {
         userModalRef.current?.show()
+        return
+      }
+
+      if (key === `${MenuKeys.Model}`) {
+        modelDrawerRef.current?.show()
+        return
       }
     },
   }
@@ -76,6 +85,7 @@ export default function Dashboard() {
       />
 
       <UserModal ref={userModalRef} />
+      <ModelDrawer ref={modelDrawerRef} />
     </div>
   )
 }
