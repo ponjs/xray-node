@@ -4,10 +4,14 @@ import { Button, message } from 'antd'
 import { CopyOutlined, LogoutOutlined } from '@ant-design/icons'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useRouter } from 'next/navigation'
+import { useSubLink } from '@/hooks'
 import axios from 'axios'
 
-export default function HomeActions({ link }: { link: string }) {
+export default function HomeActions({ name }: { name: string }) {
   const router = useRouter()
+
+  const link = useSubLink(name)
+
   const logout = async () => {
     await axios({
       url: '/api/logout',

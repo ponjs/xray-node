@@ -1,14 +1,17 @@
 import { ClockCircleOutlined, LockOutlined, SwapOutlined, WalletOutlined } from '@ant-design/icons'
 import { Tooltip } from 'antd'
-import Image from 'next/image'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 import HomeActions from '@/components/HomeActions'
-import QRCode from 'qrcode'
-import { headers } from 'next/headers'
+import HomeQRCode from '@/components/HomeQRCode'
+import { redirect } from 'next/navigation'
+import { verifySession } from '@/lib/cookie'
 import { formatBytes } from '@/utils'
+import getInbound from '@/lib/services/getInbound'
+import * as api from '@/lib/services/api'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
+import convertModel from '@/lib/services/convertModel'
 
 const clients = [
   { name: 'Windows', owner: '2dust', repo: 'v2rayN' },
@@ -17,19 +20,24 @@ const clients = [
   { name: 'iOS', link: 'https://apps.apple.com/us/app/shadowrocket/id932747118' },
 ]
 
-export default async function Home() {
-  const userinfo = {
-    name: 'Test',
-    enable: false,
-    up: 0,
-    down: 0,
-    total: 1000000,
-    expiryTime: 0,
-  }
+const getUserInfo = async () => {
+  const userinfo = await verifySession()
+  if (!userinfo) return redirect('/login')
 
-  const isBexpired = userinfo.expiryTime && Date.now() >= userinfo.expiryTime
-  const isExceeded = userinfo.total && userinfo.up + userinfo.down >= userinfo.total
-  const isDisabled = !userinfo.enable
+  const inbound = await getInbound(userinfo.name)
+  if (inbound) return inbound
+
+  const defaults = { remark: userinfo.name, up: 0, down: 0, total: 0, enable: true, expiryTime: 0 }
+  await api.add({ listen: '', ...defaults, ...convertModel(userinfo.model) })
+  return defaults
+}
+
+export default async function Home() {
+  const userInfo = await getUserInfo()
+
+  const isBexpired = userInfo.expiryTime && Date.now() >= userInfo.expiryTime
+  const isExceeded = userInfo.total && userInfo.up + userInfo.down >= userInfo?.total
+  const isDisabled = !userInfo.enable
 
   const information = [
     {
@@ -37,55 +45,33 @@ export default async function Home() {
       show: true,
       mark: false,
       icon: <SwapOutlined />,
-      render: () => `${formatBytes(userinfo.up)} / ${formatBytes(userinfo.down)}`,
+      render: () => `${formatBytes(userInfo.up)} / ${formatBytes(userInfo?.down)}`,
     },
     {
       title: '流量总额',
-      show: !!userinfo.total,
+      show: !!userInfo.total,
       mark: isExceeded,
       icon: <WalletOutlined />,
-      render: () => formatBytes(userinfo.total),
+      render: () => formatBytes(userInfo.total),
     },
     {
       title: '到期时间',
-      show: !!userinfo.expiryTime,
+      show: !!userInfo.expiryTime,
       mark: isBexpired,
       icon: <ClockCircleOutlined />,
-      render: () => dayjs(userinfo.expiryTime).format('YYYY-MM-DD'),
+      render: () => dayjs(userInfo.expiryTime).format('YYYY-MM-DD'),
     },
   ]
-
-  const getHostUrl = () => {
-    const headersList = headers()
-
-    const referer = headersList.get('referer')
-    if (referer) return referer.replace(/\/+$/, '')
-
-    const forwardedProto = headersList.get('x-forwarded-proto')
-    const forwardedHost = headersList.get('x-forwarded-host')
-    if (forwardedProto && forwardedHost) return `${forwardedProto}://${forwardedHost}`
-
-    return `http://${headersList.get('host')}`
-  }
-
-  const host = getHostUrl()
-  const link = host ? `${host}/s/${userinfo.name}` : ''
-
-  const qrcode = await QRCode.toDataURL(link, {
-    margin: 1.5,
-    width: 180 * 2,
-    type: 'image/webp',
-  }).catch(() => '')
 
   return (
     <div className="max-w-[60ch] mx-auto pt-24 px-8 pb-16">
       <div className="flex justify-between items-end">
         <Logo />
-        <HomeActions link={link} />
+        <HomeActions name={userInfo.remark} />
       </div>
 
       <div className="flex items-center mt-2">
-        <h2 className="font-extrabold text-2xl">{userinfo.name}</h2>
+        <h2 className="font-extrabold text-2xl">{userInfo.remark}</h2>
         {isDisabled || isExceeded || isBexpired ? (
           <LockOutlined className="text-sm text-red-400 ml-2" title="已禁用" />
         ) : null}
@@ -106,14 +92,7 @@ export default async function Home() {
         )}
       </div>
 
-      <Image
-        // 1 + 15 / 180 = 1.0833
-        className="my-8 scale-[1.0833]"
-        alt="qrcode"
-        src={qrcode}
-        width={180}
-        height={180}
-      />
+      <HomeQRCode name={userInfo.remark} />
 
       <div className="text-sm">
         {clients.map(client => (

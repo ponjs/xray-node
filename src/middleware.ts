@@ -1,4 +1,4 @@
-import { dashboardVerify } from './lib/cookie'
+import { verifyManages } from './lib/cookie'
 import type { NextRequest } from 'next/server'
 
 export const config = {
@@ -6,7 +6,7 @@ export const config = {
 }
 
 export async function middleware(request: NextRequest) {
-  if (!/\/(login|logout)$/.test(request.nextUrl.pathname) && !(await dashboardVerify())) {
+  if (!/\/(login|logout)$/.test(request.nextUrl.pathname) && !(await verifyManages())) {
     return Response.json({
       code: 401,
       msg: '登录过期，请重新登录',

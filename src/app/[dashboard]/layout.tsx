@@ -1,4 +1,4 @@
-import { dashboardVerify } from '@/lib/cookie'
+import { verifyManages } from '@/lib/cookie'
 import { notFound } from 'next/navigation'
 
 export default async function DashboardLayout({
@@ -15,7 +15,7 @@ export default async function DashboardLayout({
     return notFound()
   }
 
-  const result = await dashboardVerify()
+  const result = await verifyManages()
 
   return <>{result ? children : login}</>
 }

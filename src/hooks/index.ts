@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export function useBoolean(defaultValue = false) {
   const [state, setState] = useState(defaultValue)
@@ -14,4 +14,14 @@ export function useBoolean(defaultValue = false) {
   )
 
   return [state, actions] as const
+}
+
+export function useSubLink(name: string) {
+  const [link, setLink] = useState('')
+
+  useEffect(() => {
+    setLink(`${location.origin}/s/${name}`)
+  }, [name])
+
+  return link
 }

@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 import cookie from 'cookie'
+import prisma from './prisma'
 
 export enum CookieName {
   SESSION = 'x_session',
@@ -51,25 +52,39 @@ export const clsCookie = (name: keyof CookiePayload) => {
   }
 }
 
-export const parseCookie = async <N extends keyof CookiePayload>(name: N) => {
-  const _cookie = cookies().get(name)
+export const verifySession = async () => {
+  const cookieStore = cookies()
+  const _cookie = cookieStore.get(CookieName.SESSION)
+
   if (_cookie) {
     try {
-      const { payload } = await jwtVerify<CookiePayload[N]>(_cookie.value, JWT_SECRET)
-      return payload
+      const {
+        payload: { username },
+      } = await jwtVerify<CookiePayload[CookieName.SESSION]>(_cookie.value, JWT_SECRET)
+
+      const userinfo = await prisma.user.findUnique({
+        where: { name: username },
+        include: { model: true },
+      })
+
+      if (userinfo) {
+        return userinfo
+      } else {
+        cookieStore.set(CookieName.SESSION, '')
+      }
     } catch (error) {}
   }
 }
 
-export const dashboardVerify = async () => {
+export const verifyManages = async () => {
   const cookieStore = cookies()
-  const manageCookie = cookieStore.get(CookieName.MANAGES)
+  const _cookie = cookieStore.get(CookieName.MANAGES)
 
-  if (manageCookie) {
+  if (_cookie) {
     try {
       const {
         payload: { username, password },
-      } = await jwtVerify<CookiePayload[CookieName.MANAGES]>(manageCookie.value, JWT_SECRET)
+      } = await jwtVerify<CookiePayload[CookieName.MANAGES]>(_cookie.value, JWT_SECRET)
 
       if (username === process.env.X_USERNAME && password === process.env.X_PASSWORD) {
         return true
