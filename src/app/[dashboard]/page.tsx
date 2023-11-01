@@ -7,7 +7,7 @@ import UserModal from './components/User'
 import ModelDrawer from './components/Model'
 import { useRef } from 'react'
 import useSWR from 'swr'
-import axios from 'axios'
+import axios from './request'
 import type { MenuProps } from 'antd'
 import type { ColumnType } from 'antd/es/table'
 import type { UserModalRef } from './components/User'
@@ -31,14 +31,18 @@ export default function Dashboard() {
       { key: MenuKeys.Logout, label: '退出登录', icon: <LogoutOutlined />, danger: true },
     ],
     onClick: ({ key }) => {
-      if (key === `${MenuKeys.User}`) {
-        userModalRef.current?.show()
-        return
-      }
-
-      if (key === `${MenuKeys.Model}`) {
-        modelDrawerRef.current?.show()
-        return
+      switch (Number(key)) {
+        case MenuKeys.User:
+          userModalRef.current?.show()
+          break
+        case MenuKeys.Model:
+          modelDrawerRef.current?.show()
+          break
+        case MenuKeys.Logout:
+          axios
+            .post<TResponse>('/api/dashboard/logout')
+            .then(res => res.data.code === 200 && location.reload())
+          break
       }
     },
   }

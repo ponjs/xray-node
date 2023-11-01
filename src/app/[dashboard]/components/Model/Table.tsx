@@ -1,5 +1,5 @@
 import { Table } from 'antd'
-import { useModels } from '@/hooks'
+import { useModels } from '../../request'
 import type { ColumnType } from 'antd/es/table'
 
 export default function ModelTable() {

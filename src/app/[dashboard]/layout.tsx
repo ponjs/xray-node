@@ -1,7 +1,7 @@
-import { cookies } from 'next/headers'
+import { dashboardVerify } from '@/lib/cookie'
 import { notFound } from 'next/navigation'
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   params,
   children,
   login,
@@ -15,8 +15,7 @@ export default function DashboardLayout({
     return notFound()
   }
 
-  const cookieStore = cookies()
-  const session = cookieStore.get('x_session')
+  const result = await dashboardVerify()
 
-  return <>{!session ? children : login}</>
+  return <>{result ? children : login}</>
 }
