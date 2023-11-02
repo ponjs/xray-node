@@ -4,6 +4,7 @@ import {
   BlockOutlined,
   DeleteOutlined,
   EditOutlined,
+  LoadingOutlined,
   LogoutOutlined,
   MenuOutlined,
   QrcodeOutlined,
@@ -16,6 +17,7 @@ import ActionSwicth from '@/components/ActionSwicth'
 import UserModal from './components/User/FormModal'
 import UserQRCode from './components/User/QRCode'
 import ModelDrawer from './components/Model'
+import useSWRMutation from 'swr/mutation'
 import { useRef, useState } from 'react'
 import { formatBytes } from '@/utils'
 import dayjs from 'dayjs'
@@ -42,12 +44,29 @@ export default function Dashboard() {
   const userQRCodeRef = useRef<UserQRCodeRef>(null)
   const modelDrawerRef = useRef<ModelDrawerRef>(null)
 
+  const logoutMutation = useSWRMutation(
+    '/api/dashboard/logout',
+    url => request.post<TResponse>(url),
+    {
+      onSuccess: res => {
+        if (res.data.code === 200) {
+          location.reload()
+        }
+      },
+    }
+  )
+
   const menu: MenuProps = {
     items: [
       { key: MenuKeys.User, label: '添加用户', icon: <UserAddOutlined /> },
       { key: MenuKeys.Model, label: '模型管理', icon: <BlockOutlined /> },
       { type: 'divider' },
-      { key: MenuKeys.Logout, label: '退出登录', icon: <LogoutOutlined />, danger: true },
+      {
+        key: MenuKeys.Logout,
+        label: '退出登录',
+        icon: logoutMutation.isMutating ? <LoadingOutlined /> : <LogoutOutlined />,
+        danger: true,
+      },
     ],
     onClick: ({ key }) => {
       switch (Number(key)) {
@@ -58,9 +77,7 @@ export default function Dashboard() {
           modelDrawerRef.current?.show()
           break
         case MenuKeys.Logout:
-          request
-            .post<TResponse>('/api/dashboard/logout')
-            .then(res => res.data.code === 200 && location.reload())
+          logoutMutation.trigger()
           break
       }
     },
