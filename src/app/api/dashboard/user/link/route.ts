@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const id = searchParams.get('id')
 
-  if (isNaN(Number(id))) return Response.json(failRes)
+  if (!id || isNaN(Number(id))) return Response.json(failRes)
 
   const user = await prisma.user.findUnique({
     where: { id: Number(id) },

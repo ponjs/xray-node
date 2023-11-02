@@ -1,21 +1,21 @@
 import { verifyManages } from '@/lib/cookie'
-import { notFound } from 'next/navigation'
+
+export const dynamicParams = false
+
+export function generateStaticParams() {
+  return [
+    {
+      dashboard: process.env.DASHBOARD_PATH?.replace(/^\/|\/$/, '') || 'dashboard',
+    },
+  ]
+}
 
 export default async function DashboardLayout({
-  params,
   children,
   login,
 }: {
-  params: { dashboard: string }
   children: React.ReactNode
   login: React.ReactNode
 }) {
-  const pagePath = process.env.DASHBOARD_PATH?.replace(/^\/|\/$/, '') || 'dashboard'
-  if (params.dashboard !== pagePath) {
-    return notFound()
-  }
-
-  const result = await verifyManages()
-
-  return <>{result ? children : login}</>
+  return <>{(await verifyManages()) ? children : login}</>
 }
