@@ -29,7 +29,6 @@ export async function POST(request: Request) {
     total: toFixed((body.total || 0) * ONE_GB, 0),
     enable: inbound?.enable ?? true,
     expiryTime: body.expiryTime ?? 0,
-    listen: '',
     ...convertModel(user.model),
   }
 

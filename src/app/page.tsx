@@ -32,7 +32,7 @@ const getUserInfo = async () => {
   if (inbound) return inbound
 
   const defaults = { remark: userinfo.name, up: 0, down: 0, total: 0, enable: true, expiryTime: 0 }
-  await api.add({ listen: '', ...defaults, ...convertModel(userinfo.model) })
+  await api.add({ ...defaults, ...convertModel(userinfo.model) })
   return defaults
 }
 

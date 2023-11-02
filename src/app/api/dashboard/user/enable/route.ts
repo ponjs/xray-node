@@ -29,7 +29,6 @@ export async function POST(request: Request) {
       total: 0,
       enable: !!status,
       expiryTime: 0,
-      listen: '',
       ...convertModel(user.model),
     })
   }

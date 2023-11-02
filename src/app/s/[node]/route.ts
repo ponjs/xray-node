@@ -41,7 +41,6 @@ export async function GET(request: Request, { params: { node } }: { params: { no
     total: inbound?.total ?? 0,
     enable: inbound?.enable ?? true,
     expiryTime: inbound?.expiryTime ?? 0,
-    listen: '',
     ...convertModel(user.model),
   }
 

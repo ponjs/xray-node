@@ -17,6 +17,7 @@ export default function convertModel(model: {
   sniffing: string
 }) {
   return {
+    listen: '',
     port: randomIntRange(...model.port.split('-').map(p => Number(p))),
     protocol: model.protocol,
     settings: model.settings.replaceAll('<random>', randomString()),
