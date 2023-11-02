@@ -1,5 +1,5 @@
 .input {
-  @apply w-[280px] h-[48px] pl-1 pr-0;
+  @apply w-[280px] h-[48px] pl-1 pr-0 !important;
 }
 
 .input input {
@@ -11,5 +11,5 @@
 }
 
 .icon {
-  @apply flex items-center justify-center w-12 h-12 text-xl cursor-pointer transition hover:opacity-40;
+  @apply flex items-center justify-center w-12 h-12 text-xl cursor-pointer transition hover:opacity-40 !important;
 }

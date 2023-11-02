@@ -97,12 +97,9 @@ export default async function Home() {
 
       <div className="text-sm">
         {clients.map(client => (
-          <div
-            key={client.name}
-            className="opacity-60 hover:opacity-40 transition mb-2 cursor-pointer"
-          >
+          <div key={client.name} className="mb-2">
             <Link
-              className="inline-block pd-2 border-b-[1px] border-current"
+              className="opacity-60 hover:opacity-40 transition inline-block pd-2 border-b-[1px] border-current cursor-pointer"
               href={
                 client.link
                   ? client.link
