@@ -61,7 +61,7 @@ const UserQRCode = forwardRef<UserQRCodeRef>((props, ref) => {
       afterOpenChange={afterOpenChange}
     >
       <div className="flex flex-col items-center justify-center w-full">
-        <div className="w-full px-[10px] pt-2">
+        <div className="w-full px-[8px] pt-2">
           <Segmented
             block
             options={TabOptions}
@@ -72,7 +72,7 @@ const UserQRCode = forwardRef<UserQRCodeRef>((props, ref) => {
 
         <Spin spinning={isMutating}>
           <CopyToClipboard text={link} onCopy={() => message.success('已复制')}>
-            <div className="w-[240px] h-[240px] cursor-pointer select-none transition-transform active:scale-95">
+            <div className="w-[240px] h-[240px] mt-2 cursor-pointer select-none transition-transform active:scale-95">
               {link && <QRCode bordered={false} size={240} value={link} />}
             </div>
           </CopyToClipboard>
