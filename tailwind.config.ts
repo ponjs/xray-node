@@ -22,6 +22,7 @@ const config: Config = {
   },
   plugins: [],
   important: true,
+  darkMode: 'media',
   corePlugins: {
     preflight: false,
   },

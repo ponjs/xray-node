@@ -1,6 +1,5 @@
 import { Inter } from 'next/font/google'
-import { ConfigProvider } from 'antd'
-import zhCN from 'antd/locale/zh_CN'
+import { cookies } from 'next/headers'
 import StyledComponentsRegistry from '../lib/AntdRegistry'
 import 'tailwindcss/tailwind.css'
 import '../styles/preflight.css'
@@ -21,11 +20,33 @@ export const viewport: Viewport = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const themeCookie = cookies().get('theme')
+
   return (
     <html lang="zh-CN">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+            const theme = mediaQuery.matches ? 'dark' : 'light'
+            document.cookie = \`theme=\$\{theme\}\`
+            if (theme !== localStorage.getItem('theme')) {
+              localStorage.setItem('theme', theme)
+              location.reload()
+            }
+            mediaQuery.addEventListener('change', event => {
+              const theme = event.matches ? 'dark' : 'light'
+              document.cookie = \`theme=\$\{theme\}\`
+              localStorage.setItem('theme', theme)
+            })
+          `,
+          }}
+        />
+      </head>
       <body className={inter.className}>
-        <StyledComponentsRegistry>
-          <ConfigProvider locale={zhCN}>{children}</ConfigProvider>
+        <StyledComponentsRegistry darkMode={themeCookie?.value === 'dark'}>
+          {children}
         </StyledComponentsRegistry>
       </body>
     </html>

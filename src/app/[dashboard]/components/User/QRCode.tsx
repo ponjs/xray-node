@@ -57,11 +57,12 @@ const UserQRCode = forwardRef<UserQRCodeRef>((props, ref) => {
       centered
       width={240 + 24 * 2}
       footer={null}
+      styles={{ content: { padding: '28px 24px 24px' } }}
       onCancel={hide}
       afterOpenChange={afterOpenChange}
     >
       <div className="flex flex-col items-center justify-center w-full">
-        <div className="w-full px-[8px] pt-2">
+        <div className="w-full px-[8px]">
           <Segmented
             block
             options={TabOptions}

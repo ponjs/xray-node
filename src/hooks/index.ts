@@ -25,3 +25,24 @@ export function useSubLink(name: string) {
 
   return link
 }
+
+export const useDarkMode = () => {
+  const [isDarkMode, setIsDarkMode] = useState<boolean>()
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsDarkMode(event.matches)
+    }
+
+    mediaQuery.addEventListener('change', handleChange)
+    setIsDarkMode(mediaQuery.matches)
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange)
+    }
+  }, [])
+
+  return isDarkMode
+}

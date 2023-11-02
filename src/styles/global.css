@@ -5,10 +5,17 @@ body {
 }
 
 html {
-  /* color: #1f2328; */
-  /* background-color: #ffffff; */
+  color: #000000e0;
+  background-color: #fff;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color: #ffffffd9;
+    background-color: #000;
+  }
 }
 
 @media (max-width: 575px) {
@@ -25,14 +32,30 @@ html {
   height: 6px;
 }
 
+.ant-table-content::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 0;
+}
+
 .ant-table-content::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 99px;
   cursor: pointer;
   user-select: none;
 }
 
-.ant-table-content::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 0;
+@media (prefers-color-scheme: dark) {
+  .ant-table-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .ant-message {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .ant-message .ant-message-notice-wrapper .ant-message-notice-content {
+    background: #1f1f1f;
+  }
 }
