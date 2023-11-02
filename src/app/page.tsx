@@ -13,6 +13,9 @@ import clsx from 'clsx'
 import dayjs from 'dayjs'
 import convertModel from '@/lib/services/convertModel'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const clients = [
   { name: 'Windows', owner: '2dust', repo: 'v2rayN' },
   { name: 'macOS', owner: 'yanue', repo: 'V2rayU' },

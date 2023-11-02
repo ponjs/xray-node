@@ -3,6 +3,9 @@ import getInbound from '@/lib/services/getInbound'
 import toInbound from '@/lib/services/toInbound'
 import type { NextRequest } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const failRes: TResponse = { code: 422, msg: '用户不存在' }
 
 export async function GET(request: NextRequest) {

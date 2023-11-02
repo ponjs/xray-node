@@ -4,6 +4,9 @@ import getInbound from '@/lib/services/getInbound'
 import convertModel from '@/lib/services/convertModel'
 import toInbound from '@/lib/services/toInbound'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET(request: Request, { params: { node } }: { params: { node: string } }) {
   const user = await prisma.user.findUnique({
     where: { name: node },

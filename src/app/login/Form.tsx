@@ -2,7 +2,6 @@
 
 import { Form, Input } from 'antd'
 import { LoadingOutlined, SwapRightOutlined } from '@ant-design/icons'
-import { useRouter } from 'next/navigation'
 import useSWRMutation from 'swr/mutation'
 import axios from 'axios'
 import clsx from 'clsx'
@@ -12,7 +11,6 @@ type TFormData = { username: string }
 
 export default function LoginForm() {
   const [form] = Form.useForm<TFormData>()
-  const router = useRouter()
 
   const { error, isMutating, reset, trigger } = useSWRMutation(
     '/api/login',
@@ -22,7 +20,7 @@ export default function LoginForm() {
         .then(res => res.data.code !== 200 && Promise.reject(res)),
     {
       onSuccess: () => {
-        router.replace('/')
+        location.replace('/')
       },
       onError: () => {
         setTimeout(reset, 500)
