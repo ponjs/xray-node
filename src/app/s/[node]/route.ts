@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma'
 import * as api from '@/lib/services/api'
 import convertModel from '@/lib/services/convertModel'
 import getInbound from '@/lib/services/getInbound'
+import getStatus from '@/lib/services/getStatus'
 import testConnect from '@/lib/services/testConnect'
 import toInbound from '@/lib/services/toInbound'
 
@@ -26,8 +27,11 @@ export async function GET(request: Request, { params: { node } }: { params: { no
     return Buffer.from(link).toString('base64')
   }
 
-  if (inbound && (await testConnect(service, inbound.port))) {
-    return new Response(genLink(inbound))
+  if (inbound) {
+    const { isBexpired, isExceeded, isDisabled } = getStatus(inbound)
+    if (isBexpired || isExceeded || isDisabled || (await testConnect(service, inbound.port))) {
+      return new Response(genLink(inbound))
+    }
   }
 
   const params: XInboundParams = {

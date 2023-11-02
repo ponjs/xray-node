@@ -7,11 +7,12 @@ import HomeQRCode from '@/components/HomeQRCode'
 import { redirect } from 'next/navigation'
 import { verifySession } from '@/lib/cookie'
 import { formatBytes } from '@/utils'
+import convertModel from '@/lib/services/convertModel'
 import getInbound from '@/lib/services/getInbound'
+import getStatus from '@/lib/services/getStatus'
 import * as api from '@/lib/services/api'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
-import convertModel from '@/lib/services/convertModel'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -37,10 +38,7 @@ const getUserInfo = async () => {
 
 export default async function Home() {
   const userInfo = await getUserInfo()
-
-  const isBexpired = userInfo.expiryTime && Date.now() >= userInfo.expiryTime
-  const isExceeded = userInfo.total && userInfo.up + userInfo.down >= userInfo?.total
-  const isDisabled = !userInfo.enable
+  const { isBexpired, isExceeded, isDisabled } = getStatus(userInfo)
 
   const information = [
     {
