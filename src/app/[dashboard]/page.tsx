@@ -156,7 +156,7 @@ export default function Dashboard() {
           {record.inbound ? (
             <ActionButton
               icon={<QrcodeOutlined />}
-              onClick={() => userQRCodeRef.current?.show(record.id)}
+              onClick={() => userQRCodeRef.current?.show(record)}
             />
           ) : null}
         </Space>
