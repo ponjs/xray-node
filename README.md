@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+这是一个适用于 [x-ui](https://github.com/vaxilu/x-ui) 的管理站点。在使用该项目之前，需先安装 `x-ui` 才能接下来的步骤。该项目使用 [Next.js](https://nextjs.org/docs) 框架开发，所有你得有相关前端的经验才能更好的上手。
 
-## Getting Started
+## 功能
 
-First, run the development server:
+- 使用订阅链接的方式生成用户节点
+- 自动检测节点是否可用并重新生成
+- 用户端根据用户名登录查看节点信息以及订阅链接
+- 后台可配置服务模型和用户管理
+- 适配移动端且整站支持暗黑模式
+
+![](https://raw.github.com/ponjs/xray-node/master/public/readme-dashboard.png)
+![](https://raw.github.com/ponjs/xray-node/master/public/readme-client.png)
+
+## 开发
+
+在执行下面命令之前，得确保你电脑已经安装好了 [Node.js 18.17](https://nodejs.org/) 以上版本和 [yarn](https://yarnpkg.com/)。
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 安装依赖
+yarn install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+将项目中 `.env.example` 文件复制一份到根目录并改名为 `.env`，在 `.env` 文件填入项目 `x-ui` 相关信息。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+X_BASE_URL="http://127.0.0.1:54321"
+X_USERNAME="username"
+X_PASSWORD="password"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+创建本地数据库。
 
-## Learn More
+```bash
+npx prisma migrate dev --name init
+```
 
-To learn more about Next.js, take a look at the following resources:
+执行下面命令运行开发模式，在浏览器访问 `http://localhost:3000` 即可。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+yarn dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## 部署
 
-## Deploy on Vercel
+在部署之前可先查看 [Next.js](https://nextjs.org/docs/app/building-your-application/deploying) 文档。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```bash
+# 编译
+yarn build
+# 运行
+yarn start
+```
