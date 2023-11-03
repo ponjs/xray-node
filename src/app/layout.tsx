@@ -28,19 +28,33 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html: `
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-            const theme = mediaQuery.matches ? 'dark' : 'light'
-            document.cookie = \`theme=\$\{theme\}\`
-            if (theme !== localStorage.getItem('theme')) {
-              localStorage.setItem('theme', theme)
-              location.reload()
-            }
-            mediaQuery.addEventListener('change', event => {
-              const theme = event.matches ? 'dark' : 'light'
-              document.cookie = \`theme=\$\{theme\}\`
-              localStorage.setItem('theme', theme)
-            })
-          `,
+              function setCookie(name, value) {
+                document.cookie = encodeURIComponent(name) + '=' + encodeURIComponent(value) + '; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/'
+              }
+              function getCookie(name) {
+                return (
+                  decodeURIComponent(
+                    document.cookie.replace(
+                      new RegExp(
+                        '(?:(?:^|.*;)\\\\s*' +
+                          encodeURIComponent(name).replace(/[-.+*]/g, '\\\\$&') +
+                          '\\\\s*\\\\=\\\\s*([^;]*).*$)|^.*$'
+                      ),
+                      '$1'
+                    )
+                  ) || null
+                )
+              }
+              const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+              const theme = mediaQuery.matches ? 'dark' : 'light'
+              if (theme !== getCookie('theme')) {
+                setCookie('theme', theme)
+                location.reload()
+              }
+              mediaQuery.addEventListener('change', event => {
+                setCookie('theme', event.matches ? 'dark' : 'light')
+              })
+            `,
           }}
         />
       </head>
