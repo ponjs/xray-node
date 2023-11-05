@@ -2,7 +2,7 @@ import net from 'net'
 import dns from 'dns'
 
 export default function testConnect(address: string, port: number) {
-  return new Promise(resolve => {
+  return new Promise<boolean>(resolve => {
     const socket = new net.Socket()
 
     socket.on('connect', () => {

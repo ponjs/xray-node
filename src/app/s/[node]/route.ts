@@ -5,9 +5,16 @@ import getInbound from '@/lib/services/getInbound'
 import getStatus from '@/lib/services/getStatus'
 import testConnect from '@/lib/services/testConnect'
 import toInbound from '@/lib/services/toInbound'
+import ForceUpdate from './ForceUpdate'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
+const forceUpdate = new ForceUpdate({
+  maximum: 2,
+  interval: 30 * 1000,
+  continuous: 2,
+})
 
 export async function GET(request: Request, { params: { node } }: { params: { node: string } }) {
   const user = await prisma.user.findUnique({
@@ -27,6 +34,23 @@ export async function GET(request: Request, { params: { node } }: { params: { no
     return Buffer.from(link).toString('base64')
   }
 
+  const upsert = async () => {
+    const params: XInboundParams = {
+      remark: user.name,
+      up: inbound?.up ?? 0,
+      down: inbound?.down ?? 0,
+      total: inbound?.total ?? 0,
+      enable: inbound?.enable ?? true,
+      expiryTime: inbound?.expiryTime ?? 0,
+      ...convertModel(user.model),
+    }
+    inbound ? await api.update(inbound.id, params) : await api.add(params)
+    return genLink(params)
+  }
+
+  const forceUpdatedLink = await forceUpdate.call(user.name, upsert)
+  if (forceUpdatedLink) return new Response(forceUpdatedLink)
+
   if (inbound) {
     const { isBexpired, isExceeded, isDisabled } = getStatus(inbound)
     if (isBexpired || isExceeded || isDisabled || (await testConnect(service, inbound.port))) {
@@ -34,17 +58,6 @@ export async function GET(request: Request, { params: { node } }: { params: { no
     }
   }
 
-  const params: XInboundParams = {
-    remark: user.name,
-    up: inbound?.up ?? 0,
-    down: inbound?.down ?? 0,
-    total: inbound?.total ?? 0,
-    enable: inbound?.enable ?? true,
-    expiryTime: inbound?.expiryTime ?? 0,
-    ...convertModel(user.model),
-  }
-
-  inbound ? await api.update(inbound.id, params) : await api.add(params)
-
-  return new Response(genLink(params))
+  const link = await upsert()
+  return new Response(link)
 }
