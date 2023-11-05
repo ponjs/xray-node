@@ -48,14 +48,15 @@ export async function GET(request: Request, { params: { node } }: { params: { no
     return genLink(params)
   }
 
-  const forceUpdatedLink = await forceUpdate.call(user.name, upsert)
-  if (forceUpdatedLink) return new Response(forceUpdatedLink)
-
   if (inbound) {
     const { isBexpired, isExceeded, isDisabled } = getStatus(inbound)
-    if (isBexpired || isExceeded || isDisabled || (await testConnect(service, inbound.port))) {
-      return new Response(genLink(inbound))
-    }
+    if (isBexpired || isExceeded || isDisabled) return new Response(genLink(inbound))
+
+    const forceUpdatedLink = await forceUpdate.call(user.name, upsert)
+    if (forceUpdatedLink) return new Response(forceUpdatedLink)
+
+    const tested = await testConnect(service, inbound.port)
+    if (tested) return new Response(genLink(inbound))
   }
 
   const link = await upsert()
