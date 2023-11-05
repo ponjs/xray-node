@@ -1,15 +1,15 @@
 type TRecorderItem = { count: number; timestamp: number[] }
 
 export default class ForceUpdate {
-  lastClearTime: number
-  recorder: Map<string, TRecorderItem>
+  private lastClearTime: number
+  private recorder: Map<string, TRecorderItem>
 
   constructor(
     /**
      * {interval} 毫秒内的第 {continuous} 次为强刷
      * 一天只能有 {maximum} 次强刷
      */
-    public config: {
+    private config: {
       maximum: number
       interval: number
       continuous: number
@@ -27,16 +27,14 @@ export default class ForceUpdate {
       this.lastClearTime = new Date().setHours(0, 0, 0, 0)
     }
 
-    const { count, timestamp } = this.recorder.get(key) || { count: 0, timestamp: [] }
+    const current = this.recorder.get(key)
+    const count = current?.count || 0
+    let timestamp = current?.timestamp || []
 
     if (count >= this.config.maximum) return
+    if (timestamp[0] && now > timestamp[0] + this.config.interval) timestamp = []
 
-    if (timestamp[0] && now > timestamp[0] + this.config.interval) {
-      this.recorder.set(key, { count, timestamp: [] })
-      return
-    }
-
-    if (this.config.continuous <= timestamp.length + 1) {
+    if (timestamp.length + 1 >= this.config.continuous) {
       const result = await callback()
       this.recorder.set(key, { count: count + 1, timestamp: [] })
       return result
