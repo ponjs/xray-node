@@ -10,15 +10,16 @@ import {
   QrcodeOutlined,
   UserAddOutlined,
 } from '@ant-design/icons'
-import { Button, Dropdown, Space, Table, Tag, message } from 'antd'
+import { Button, Dropdown, Space, Table, Tag, message, theme } from 'antd'
 import Logo from '@/components/Logo'
 import ActionButton from '@/components/ActionButton'
 import ActionSwicth from '@/components/ActionSwicth'
 import UserModal from './components/User/FormModal'
 import UserQRCode from './components/User/QRCode'
+import SearchInput from './components/User/SearchInput'
 import ModelDrawer from './components/Model'
 import useSWRMutation from 'swr/mutation'
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { formatBytes } from '@/utils'
 import dayjs from 'dayjs'
 import request, { useUsers } from './request'
@@ -40,6 +41,10 @@ const inboundRender =
     inbound ? render(inbound) : '-'
 
 export default function Dashboard() {
+  const {
+    token: { colorPrimary },
+  } = theme.useToken()
+
   const userModalRef = useRef<UserModalRef>(null)
   const userQRCodeRef = useRef<UserQRCodeRef>(null)
   const modelDrawerRef = useRef<ModelDrawerRef>(null)
@@ -84,6 +89,19 @@ export default function Dashboard() {
   }
 
   const { data, isLoading, mutate } = useUsers()
+  const [keyword, setKeyword] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const dataSource = useMemo(() => {
+    if (!keyword) return data
+    const _keyword = keyword.toLowerCase()
+    return data?.filter(item => item.name.toLowerCase().includes(_keyword))
+  }, [data, keyword])
+
+  const handleSearch = (value: string) => {
+    setKeyword(() => value)
+    setCurrentPage(1)
+  }
 
   const handleDelete = (id: number) =>
     request.post<TResponse>('/api/dashboard/user/delete', { id }).then(res => {
@@ -98,15 +116,22 @@ export default function Dashboard() {
       .post<TResponse>('/api/dashboard/user/enable', data)
       .then(res => (res.data.code === 200 ? mutate() : Promise.reject(res)))
 
-  const [currentPage, setCurrentPage] = useState(1)
-
   const columns: ColumnType<TUserRecord>[] = [
     {
       title: '序号',
       width: 62,
       render: (value, record, index) => index + 1 + (currentPage - 1) * 10,
     },
-    { title: '名称', dataIndex: 'name' },
+    {
+      title: '名称',
+      dataIndex: 'name',
+      render: value => {
+        if (!keyword) return <div>{value}</div>
+        const regex = new RegExp('(' + keyword + ')', 'gi')
+        const html = value.replace(regex, `<span style="color: ${colorPrimary}">$1</span>`)
+        return <div dangerouslySetInnerHTML={{ __html: html }} />
+      },
+    },
     { title: '模型', render: (_, record) => record.model.name },
     {
       title: '协议',
@@ -185,9 +210,12 @@ export default function Dashboard() {
     <div className="max-w-[960px] mx-auto py-16 px-4">
       <div className="flex items-center justify-between mb-4">
         <Logo />
-        <Dropdown placement="bottomRight" menu={menu}>
-          <Button icon={<MenuOutlined />} />
-        </Dropdown>
+        <Space>
+          <SearchInput onSearch={handleSearch} />
+          <Dropdown placement="bottomRight" menu={menu}>
+            <Button icon={<MenuOutlined />} />
+          </Dropdown>
+        </Space>
       </div>
 
       <Table
@@ -195,7 +223,7 @@ export default function Dashboard() {
         loading={isLoading}
         rowKey="id"
         columns={columns}
-        dataSource={data}
+        dataSource={dataSource}
         scroll={{ x: 'max-content' }}
         pagination={{ hideOnSinglePage: true, current: currentPage, onChange: setCurrentPage }}
       />
